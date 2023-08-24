@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: welissonoliveira/pedelogo-catalogo:v1.0.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: api-configmap
+        env:
+          - name: Mongo__User
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-configmap
+                key: MONGO_INITDB_ROOT_USERNAME
+          - name: Mongo__Password
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-configmap
+                key: MONGO_INITDB_ROOT_PASSWORD
+

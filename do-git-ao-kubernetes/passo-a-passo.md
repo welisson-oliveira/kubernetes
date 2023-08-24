@@ -1,4 +1,5 @@
 1. Clonar repositorio do GIT: ```git clone git@github.com:KubeDev/pedelogo-catalogo.git```
+
     1.1. Criar Dockerfile na raiz do projeto: 
     ```docker 
     FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
@@ -27,8 +28,8 @@
     COPY --from=publish /app/publish .
     ENTRYPOINT [ "dotnet", "PedeLogo.Catalogo.Api.dll" ]
     ```
-    
-    Arquivo Dockerfile Completo:
+
+    ### Arquivo Dockerfile Completo:
     #### Dockerfile
     ```docker 
     FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
@@ -56,9 +57,25 @@
 4. Suba para o dockerhub:                                      ``` docker push welissonoliveira/pedelogo-catalogo:v1.0.0 ```
 5. Certifique-se de que o projeto esta publico no docker hub
 6. Criar os manifestos para subir no kubernetes:
-    6.1. primeiro criaremos o deployment para o mongo                    ``` kubectl apply -f ./k8s/mongodb/deployment.yml ```
-    #### deployment.yml
+
+    6.1. Codifique as strings necessarias em base64 utilizando o terminal: ``` echo -n "string" | base64 ```
+
+    6.2. Primeiro criaremos o Secret para o mongo: ``` kubectl apply -f ./k8s/mongodb/mongodb-secret.yml ```
+    #### mongodb-secret.yml
+    ```yml
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: mongodb-secret
+    type: Opaque
+    data:
+      MONGO_INITDB_ROOT_USERNAME: bW9uZ291c2Vy
+      MONGO_INITDB_ROOT_PASSWORD: bW9uZ29wd2Q=
     ```
+
+    6.3. Agora criaremos o deployment para o mongo: ``` kubectl apply -f ./k8s/mongodb/deployment.yml ```
+    #### deployment.yml
+    ```yml
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -81,13 +98,12 @@
                 cpu: "500m"
             ports:
               - containerPort: 27017
-            env:
-              - name: MONGO_INITDB_ROOT_USERNAME
-                value: mongouser
-              - name: MONGO_INITDB_ROOT_PASSWORD
-                value: mongopwd
+            envFrom:
+              - secretRef:
+                  name: mongodb-secret
     ```
-    6.2. Criaremos o ClusterIp para o mongodb, ja que ele só vai ser acessado internamente ``` kubectl apply -f ./k8s/mongodb/clusterip.yml ```
+
+    6.4. Agora criaremos o ClusterIp para o mongodb, ja que ele só vai ser acessado internamente ``` kubectl apply -f ./k8s/mongodb/clusterip.yml ```
     #### clusterip.yml
     ```yml
     apiVersion: v1
@@ -102,7 +118,21 @@
         targetPort: 27017
       type: ClusterIP
     ```
-    6.3. Agora nosso deployment para nossa API: ``` kubectl apply -f ./k8s/api/deployment.yml ```
+
+    6.5. Agora criaremos o ConfigMap para a API: ``` kubectl apply -f ./k8s/api/api-configmap.yml ```
+    #### api-configmap.yml
+    ```yml
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: api-configmap
+    data:
+      Mongo__Host: mongo-service
+      Mongo__Port: "27017"
+      Mongo__Database: admin
+    ```
+
+    6.6. Agora nosso deployment para nossa API: ``` kubectl apply -f ./k8s/api/deployment.yml ```
     #### deployment.yml
     ```yml
     apiVersion: apps/v1
@@ -110,6 +140,7 @@
     metadata:
       name: api-deployment
     spec:
+      replicas: 1
       selector:
         matchLabels:
           app: api
@@ -120,6 +151,34 @@
         spec:
           containers:
           - name: api
+            startupProbe:
+              httpGet:
+                path: /health
+                port: 80
+                scheme: HTTP
+              initialDelaySeconds: 3
+              periodSeconds: 3
+              timeoutSeconds: 1
+              failureThreshold: 30
+            readinessProbe:
+              httpGet:
+                path: /read
+                port: 80
+                scheme: HTTP
+              initialDelaySeconds: 3
+              periodSeconds: 3
+              timeoutSeconds: 1
+              failureThreshold: 1
+            livenessProbe:
+              httpGet:
+                # host: localhost
+                path: /health
+                port: 80
+                scheme: HTTP
+              initialDelaySeconds: 3
+              periodSeconds: 3
+              timeoutSeconds: 1
+              failureThreshold: 1
             image: welissonoliveira/pedelogo-catalogo:v1.0.0
             resources:
               limits:
@@ -131,19 +190,25 @@
             - containerPort: 443
               name: https
             imagePullPolicy: Always
+            envFrom:
+              - configMapRef:
+                  name: api-configmap
             env:
-              - name: Mongo__Host
-                value: "mongo-service"
               - name: Mongo__User
-                value: "mongouser"
+                valueFrom:
+                  secretKeyRef:
+                    name: mongodb-secret
+                    key: MONGO_INITDB_ROOT_USERNAME
               - name: Mongo__Password
-                value: "mongopwd"
-              - name: Mongo__Port
-                value: "27017"
-              - name: Mongo__Database
-                value: "admin"
+                valueFrom:
+                  secretKeyRef:
+                    name: mongodb-secret
+                    key: MONGO_INITDB_ROOT_PASSWORD
+
+
     ```
-    6.4. E nosso NodePort da api: ``` kubectl apply -f ./k8s/api/nodeport.yml ```
+
+    6.7. E nosso NodePort da api: ``` kubectl apply -f ./k8s/api/nodeport.yml ```
     #### nodeport.yml
     ```yml
     apiVersion: v1

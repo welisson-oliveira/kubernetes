@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: api-deployment
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: api
@@ -13,6 +14,34 @@ spec:
     spec:
       containers:
       - name: api
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          timeoutSeconds: 1
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /read
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          timeoutSeconds: 1
+          failureThreshold: 1
+        livenessProbe:
+          httpGet:
+            # host: localhost
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          timeoutSeconds: 1
+          failureThreshold: 1
         image: welissonoliveira/pedelogo-catalogo:v1.0.0
         resources:
           limits:
@@ -31,11 +60,11 @@ spec:
           - name: Mongo__User
             valueFrom:
               secretKeyRef:
-                name: mongodb-configmap
+                name: mongodb-secret
                 key: MONGO_INITDB_ROOT_USERNAME
           - name: Mongo__Password
             valueFrom:
               secretKeyRef:
-                name: mongodb-configmap
+                name: mongodb-secret
                 key: MONGO_INITDB_ROOT_PASSWORD
 

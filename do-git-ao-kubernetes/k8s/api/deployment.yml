@@ -44,6 +44,9 @@ spec:
           failureThreshold: 1
         image: welissonoliveira/pedelogo-catalogo:v1.0.0
         resources:
+          requests:
+            memory: "40Mi"
+            cpu: "3m"
           limits:
             memory: "128Mi"
             cpu: "500m"

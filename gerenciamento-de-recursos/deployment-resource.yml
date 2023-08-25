@@ -15,10 +15,10 @@ spec:
       - name: resource-container
         image: gcr.io/kubernetes-e2e-test-images/resource-consumer:1.4
         resources:
-          requests:
+          requests: # recurso inicial
             memory: "32Mi"
             cpu: "100m"
-          limits:
+          limits: # maximo
             memory: "64Mi"
             cpu: "500m" # a cada mil é um core da CP
         command:

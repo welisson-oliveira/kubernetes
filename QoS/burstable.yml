@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: burstable-deployment
+spec:
+  selector:
+    matchLabels:
+      app: burstable-pod
+  template:
+    metadata:
+      labels:
+        app: burstable-pod
+    spec:
+      containers:
+      - name: burstable-pod
+        image: nginx
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "300Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 80

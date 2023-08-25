@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guaranteed-deployment
+spec:
+  selector:
+    matchLabels:
+      app: guaranteed-pod
+  template:
+    metadata:
+      labels:
+        app: guaranteed-pod
+    spec:
+      containers:
+      - name: guaranteed-pod
+        image: nginx
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80

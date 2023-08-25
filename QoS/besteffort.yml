@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: besteffort-deployment
+spec:
+  selector:
+    matchLabels:
+      app: besteffort-pod
+  template:
+    metadata:
+      labels:
+        app: besteffort-pod
+    spec:
+      containers:
+      - name: besteffort-pod
+        image: nginx
+        ports:
+        - containerPort: 80

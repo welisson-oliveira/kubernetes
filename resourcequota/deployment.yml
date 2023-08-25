@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-quota-deployment
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: resource-quota-deployment
+  template:
+    metadata:
+      labels:
+        app: resource-quota-deployment
+    spec:
+      containers:
+      - name: resource-quota-deployment
+        image: nginx
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "599Mi"
+        ports:
+        - containerPort: 80

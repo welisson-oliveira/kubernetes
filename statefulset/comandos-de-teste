@@ -1,0 +1,3 @@
+acessar o service:
+kubectl run -i --tty --image kubedevio/ubuntu-curl ping-test --restart=Never --rm -- /bin/bash
+ curl nginx-state-0.nginx-state.default.svc.cluster.local

@@ -12,6 +12,10 @@ spec:
       labels:
         app: api
     spec:
+      initContainers:
+      - name: init-pod
+        image: busybox:1.28
+        command: ["sh", "-c", "until nslookup mongo-service.default.svc.cluster.local; do echo Aguardando o Banco de Dados; sleep 2; done"]
       containers:
       - name: api
         startupProbe:

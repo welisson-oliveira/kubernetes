@@ -10,18 +10,6 @@ nodes:
     hostPort: 30001
     protocol: TCP
 - role: worker
-  extraPortMappings:
-  - containerPort: 30002
-    hostPort: 30002
-    protocol: TCP
-  - containerPort: 30003
-    hostPort: 30003
-    protocol: TCP
 - role: worker
-  extraPortMappings:
-  - containerPort: 30004
-    hostPort: 30004
-    protocol: TCP
-  - containerPort: 30005
-    hostPort: 30005
-    protocol: TCP
+- role: worker
+- role: worker

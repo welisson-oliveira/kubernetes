@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-b
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-b
+  template:
+    metadata:
+      labels:
+        app: nginx-b
+    spec:
+      containers:
+      - name: nginx-b
+        image: nginx
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values: 
+                      - "nginx-b"
+              topologyKey: "kubernetes.io/hostname"

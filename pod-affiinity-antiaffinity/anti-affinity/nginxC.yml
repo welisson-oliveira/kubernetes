@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-c
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: nginx-c
+  template:
+    metadata:
+      labels:
+        app: nginx-c
+    spec:
+      containers:
+      - name: nginx-c
+        image: nginx
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - ""
+                topologyKey: "kubernetes.io/hostname"
+            

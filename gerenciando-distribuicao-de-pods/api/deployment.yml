@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      initContainers:
+      - name: init-pod
+        image: busybox:1.28
+        command: ["sh", "-c", "until nslookup mongo-service.default.svc.cluster.local; do echo Aguardando o Banco de Dados; sleep 2; done"]
+      containers:
+      - name: api
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          timeoutSeconds: 1
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /read
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          timeoutSeconds: 1
+          failureThreshold: 1
+        livenessProbe:
+          httpGet:
+            # host: localhost
+            path: /health
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          timeoutSeconds: 1
+          failureThreshold: 1
+        image: welissonoliveira/pedelogo-catalogo:v1.0.0
+        resources:
+          requests:
+            memory: "40Mi"
+            cpu: "3m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: api-configmap
+        env:
+          - name: Mongo__User
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: MONGO_INITDB_ROOT_USERNAME
+          - name: Mongo__Password
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: MONGO_INITDB_ROOT_PASSWORD
+

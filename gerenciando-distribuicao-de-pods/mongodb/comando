@@ -1,0 +1,2 @@
+adiciona o label ao node k8s-worker
+kubectl label node k8s-worker database=mongodb

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-taint
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: nginx-taint
+  template:
+    metadata:
+      labels:
+        app: nginx-taint
+    spec:
+      containers:
+      - name: nginx-taint
+        image: nginx
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+      tolerations:
+        - key: "special"
+          operator: "Equal"
+          value: "manutencao"
+          effect: "NoExecute"
+          tolerationSeconds: 60 # se adicionado, permanece apenas pelo tempo determinado

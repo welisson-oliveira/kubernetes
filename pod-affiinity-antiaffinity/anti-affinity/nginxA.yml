@@ -23,7 +23,7 @@ spec:
         - containerPort: 80
       affinity:
         podAntiAffinity:
-          preDuringSchedulingIgnoredDuringExecution:
+          requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
                   - key: app

@@ -1,0 +1,3 @@
+baixe o arquivo de configração do ingress
+wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/baremetal/deploy.yaml 
+adicione o nodePort:30000 no Service ingress-nginx-controller no arquivo deploy.yaml

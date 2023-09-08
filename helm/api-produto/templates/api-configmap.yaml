@@ -4,5 +4,5 @@ metadata:
   name: {{ .Release.Name }}-api-configmap
   namespace: default
 data:
-    Mongo__Host: {{ .Release.Name }}-mongo-service
+    Mongo__Host: {{template "mongodb.serviceName" . }}
     Mongo__DataBase: {{ .Values.mongodb.credentials.database }}

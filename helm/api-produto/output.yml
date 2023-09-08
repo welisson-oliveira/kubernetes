@@ -1,5 +1,5 @@
 NAME: minha-api
-LAST DEPLOYED: Fri Sep  8 16:58:57 2023
+LAST DEPLOYED: Fri Sep  8 18:49:07 2023
 NAMESPACE: default
 STATUS: pending-install
 REVISION: 1
@@ -140,11 +140,12 @@ metadata:
     release: "minha-api"
     heritage: "Helm"
 spec:
+  ingressClassName: nginx
   rules:
     - host: 127.0.0.1.nip.io
       http:
         paths:
-        - path: /
+        - path: "/"
           pathType: Prefix
           backend:
             service:

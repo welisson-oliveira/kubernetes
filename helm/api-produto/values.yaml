@@ -1,0 +1,11 @@
+mongodb:
+  tag: 4.2.8
+  # existSecret: nome-do-secret
+  credentials:
+    username: mongouser
+    password: mongopwd
+    database: admin
+api:
+  image: fabricioveronez/pedelogo-catalogo:v1
+  serviceType: LoadBalancer
+    

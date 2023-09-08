@@ -1,0 +1,17 @@
+HELM
+- criar repositorio							```helm repo add stable https://charts.helm.sh/stable```
+- atualizar repositorios					```helm repo update```
+- listar repositorios						```helm repo list```
+- remover repositorios						```helm repo remove [nome-do-repositorio]```
+- pesquisar no repositorio 					```helm repo search [palavra-chave]```
+- inspecionar tudo 							```helm inspect all [repositorio/nome-do-chart]```
+- instalar via helm							```helm install meu-ingress-controller ingress-nginx/ingress-nginx --wait```
+- atualizar 								```helm upgrade meu-ingress-controller ingress-nginx/ingress-nginx --values [path-do-arquivo-de-alteracao]```
+- verificar historico 						```helm history meu-ingress-controller -n nginx-ingress```
+- listar as instalações 					```helm list```
+- desisntalar release 						```helm unnstall [nome-da-release]```
+- realizar rollback							```helm rollback meu-ingress-controller -n nginx-ingress```
+- rollback para versão especifica           ```helm rollback meu-ingress-controller [numero-da-versao] -n nginx-ingress```
+- atualizar direto na linha de comando 		```helm upgrade meu-ingress-controller ingress-nginx/ingress-nginx --namespace nginx-ingress --set controller.replicaCount=2```
+- criar um helm                             ```helm create [nome]```
+- verificar se helm esta correto            ```helm install minha-api ./api-produto --dry-run --debug > ./api-produto/output.yml```

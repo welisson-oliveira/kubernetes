@@ -1,1 +1,4 @@
-Instalado
+# Instalado
+
+# testar if
+# helm install minha-api  ./helm/api-produto --set mongodb.existSecret=umsecret --dry-run --debug > ./helm/api-produto/output.yml

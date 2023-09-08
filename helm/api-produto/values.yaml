@@ -1,3 +1,8 @@
+api:
+  image: fabricioveronez/pedelogo-catalogo:v1
+  serviceType: ClusterIP
+  ingress:
+  - 127.0.0.1.nip.io
 mongodb:
   tag: 4.2.8
   # existSecret: nome-do-secret
@@ -5,7 +10,4 @@ mongodb:
     username: mongouser
     password: mongopwd
     database: admin
-api:
-  image: fabricioveronez/pedelogo-catalogo:v1
-  serviceType: LoadBalancer
     

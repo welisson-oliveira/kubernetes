@@ -25,6 +25,3 @@ spec:
         - secretRef:
             name: {{ .Values.mongodb.existSecret }}
         {{- end }}
-
-# testar if
-# helm install minha-api  ./helm/api-produto --set mongodb.existSecret=umsecret --dry-run --debug > ./helm/api-produto/output.yml

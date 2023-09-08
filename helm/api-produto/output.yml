@@ -1,5 +1,5 @@
 NAME: minha-api
-LAST DEPLOYED: Fri Sep  8 16:08:21 2023
+LAST DEPLOYED: Fri Sep  8 16:58:57 2023
 NAMESPACE: default
 STATUS: pending-install
 REVISION: 1
@@ -10,7 +10,9 @@ USER-SUPPLIED VALUES:
 COMPUTED VALUES:
 api:
   image: fabricioveronez/pedelogo-catalogo:v1
-  serviceType: LoadBalancer
+  ingress:
+  - 127.0.0.1.nip.io
+  serviceType: ClusterIP
 mongodb:
   credentials:
     database: admin
@@ -28,8 +30,8 @@ metadata:
   name: minha-api-mongodb-secret
 type: Opaque
 data:
-  MONGO_INIT_ROOT_USERNAME: "bW9uZ291c2Vy"
-  MONGO_INIT_ROOT_PASSWORD: "bW9uZ29wd2Q="
+  MONGO_INITDB_ROOT_USERNAME: "bW9uZ291c2Vy"
+  MONGO_INITDB_ROOT_PASSWORD: "bW9uZ29wd2Q="
 ---
 # Source: api-produto/templates/api-configmap.yaml
 kind: ConfigMap
@@ -52,8 +54,8 @@ spec:
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30000
-  type: LoadBalancer
+    # nodePort: 30000
+  type: ClusterIP
 ---
 # Source: api-produto/templates/mongodb-service.yaml
 apiVersion: v1
@@ -92,16 +94,16 @@ spec:
         - name: Mongo__User
           valueFrom:
             secretKeyRef:
-              key: MONGO_INIT_ROOT_USERNAME
+              key: MONGO_INITDB_ROOT_USERNAME
               name: minha-api-mongodb-secret
         - name: Mongo__Password
           valueFrom:
             secretKeyRef:
-              key: MONGO_INIT_ROOT_PASSWORD
+              key: MONGO_INITDB_ROOT_PASSWORD
               name: minha-api-mongodb-secret
         envFrom:
         - configMapRef:
-          name: minha-api-api-configmap
+            name: minha-api-api-configmap
 ---
 # Source: api-produto/templates/mongodb-deployment.yaml
 apiVersion: apps/v1
@@ -126,9 +128,32 @@ spec:
         envFrom:
         - secretRef:
             name: minha-api-mongodb-secret
+---
+# Source: api-produto/templates/api-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minha-api-api-ingress
+  labels:
+    app: minha-api-api-ingress
+    chart: "api-produto-0.1.0"
+    release: "minha-api"
+    heritage: "Helm"
+spec:
+  rules:
+    - host: 127.0.0.1.nip.io
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+                name: minha-api-api-service
+                port: 
+                    number: 80
+
+NOTES:
+# Instalado
 
 # testar if
 # helm install minha-api  ./helm/api-produto --set mongodb.existSecret=umsecret --dry-run --debug > ./helm/api-produto/output.yml
-
-NOTES:
-Instalado

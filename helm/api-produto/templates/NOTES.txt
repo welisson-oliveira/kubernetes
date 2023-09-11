@@ -1,4 +1,7 @@
-# Instalado
+A release {{ .Release.Name }} foi criada com sucesso!
 
 # testar if
 # helm install minha-api  ./helm/api-produto --set mongodb.existSecret=umsecret --dry-run --debug > ./helm/api-produto/output.yml
+
+# instalar o mongodb via chart da bitnami
+helm install my-release-mongodb oci://registry-1.docker.io/bitnamicharts/mongodb

@@ -1,5 +1,5 @@
 NAME: minha-api
-LAST DEPLOYED: Fri Sep  8 18:49:07 2023
+LAST DEPLOYED: Mon Sep 11 14:46:31 2023
 NAMESPACE: default
 STATUS: pending-install
 REVISION: 1
@@ -14,24 +14,26 @@ api:
   - 127.0.0.1.nip.io
   serviceType: ClusterIP
 mongodb:
-  credentials:
-    database: admin
+  auth:
+    database: produto
     password: mongopwd
+    rootPassword: mongoRoot
     username: mongouser
-  tag: 4.2.8
+  persistence:
+    enabled: true
 
 HOOKS:
 MANIFEST:
 ---
-# Source: api-produto/templates/mongodb-secret.yaml
+# Source: api-produto/templates/api-secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: minha-api-mongodb-secret
+  name: minha-api-api-secret
 type: Opaque
 data:
-  MONGO_INITDB_ROOT_USERNAME: "bW9uZ291c2Vy"
-  MONGO_INITDB_ROOT_PASSWORD: "bW9uZ29wd2Q="
+  Mongo__User: "bW9uZ291c2Vy"
+  Mongo__Password: "bW9uZ29wd2Q="
 ---
 # Source: api-produto/templates/api-configmap.yaml
 kind: ConfigMap
@@ -40,8 +42,8 @@ metadata:
   name: minha-api-api-configmap
   namespace: default
 data:
-    Mongo__Host: minha-api-mongo-service
-    Mongo__DataBase: admin
+    Mongo__Host: minha-api-mongodb
+    Mongo__DataBase: produto
 ---
 # Source: api-produto/templates/api-service.yaml
 apiVersion: v1
@@ -56,18 +58,6 @@ spec:
     targetPort: 80
     # nodePort: 30000
   type: ClusterIP
----
-# Source: api-produto/templates/mongodb-service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: minha-api-mongo-service
-spec:
-  selector:
-    app: minha-api-mongodb
-  ports:
-  - port: 27017
-    targetPort: 27017
 ---
 # Source: api-produto/templates/api-deployment.yaml
 apiVersion: apps/v1
@@ -90,44 +80,11 @@ spec:
         - containerPort: 80
         imagePullPolicy: Always
         resources: {}
-        env:
-        - name: Mongo__User
-          valueFrom:
-            secretKeyRef:
-              key: MONGO_INITDB_ROOT_USERNAME
-              name: minha-api-mongodb-secret
-        - name: Mongo__Password
-          valueFrom:
-            secretKeyRef:
-              key: MONGO_INITDB_ROOT_PASSWORD
-              name: minha-api-mongodb-secret
         envFrom:
         - configMapRef:
             name: minha-api-api-configmap
----
-# Source: api-produto/templates/mongodb-deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: minha-api-mongodb-deployment
-spec:
-  selector:
-    matchLabels:
-      app: minha-api-mongodb
-  template:
-    metadata:     
-      labels:
-        app: minha-api-mongodb
-    spec:
-      containers:
-      - name: mongodb
-        image: mongo:4.2.8
-        ports:
-        - containerPort: 27017
-        resources: {}
-        envFrom:
         - secretRef:
-            name: minha-api-mongodb-secret
+            name: minha-api-api-secret
 ---
 # Source: api-produto/templates/api-ingress.yaml
 apiVersion: networking.k8s.io/v1
@@ -154,7 +111,10 @@ spec:
                     number: 80
 
 NOTES:
-# Instalado
+A release minha-api foi criada com sucesso!
 
 # testar if
 # helm install minha-api  ./helm/api-produto --set mongodb.existSecret=umsecret --dry-run --debug > ./helm/api-produto/output.yml
+
+# instalar o mongodb via chart da bitnami
+helm install my-release-mongodb oci://registry-1.docker.io/bitnamicharts/mongodb

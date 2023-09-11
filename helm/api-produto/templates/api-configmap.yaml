@@ -5,4 +5,4 @@ metadata:
   namespace: default
 data:
     Mongo__Host: {{template "mongodb.serviceName" . }}
-    Mongo__DataBase: {{ .Values.mongodb.credentials.database }}
+    Mongo__DataBase: {{ .Values.mongodb.auth.database }}

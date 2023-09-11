@@ -4,10 +4,10 @@ api:
   ingress:
   - 127.0.0.1.nip.io
 mongodb:
-  tag: 4.2.8
-  # existSecret: nome-do-secret
-  credentials:
+  auth:
+    rootPassword: mongoRoot
     username: mongouser
     password: mongopwd
-    database: admin
-    
+    database: produto
+  persistence: 
+    enabled: true

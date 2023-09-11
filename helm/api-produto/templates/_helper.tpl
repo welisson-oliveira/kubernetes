@@ -1,3 +1,3 @@
 {{- define "mongodb.serviceName" -}}
-{{ .Release.Name }}-mongo-service
+{{ .Release.Name }}-mongodb
 {{- end -}}

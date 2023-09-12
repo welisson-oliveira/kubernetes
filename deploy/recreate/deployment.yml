@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: api-versao
 spec:
+  strategy:
+    type: Recreate
   replicas: 10
   selector:
     matchLabels:
@@ -17,7 +19,7 @@ spec:
     spec:
       containers:
       - name: api-versao
-        image: kubedevio/api-versao:v1
+        image: kubedevio/api-versao:v2
         resources: {}
         ports:
         - containerPort: 8080

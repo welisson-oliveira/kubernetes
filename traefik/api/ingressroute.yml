@@ -1,0 +1,13 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ingressroute
+spec:
+  entryPoints:
+  - web
+  routes:
+  - match: Host(`127.0.0.1.nip.io`)
+    kind: Rule
+    services:
+    - name: nginx-service
+      port: 80

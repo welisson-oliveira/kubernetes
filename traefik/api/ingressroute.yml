@@ -6,8 +6,11 @@ spec:
   entryPoints:
   - web
   routes:
-  - match: Host(`127.0.0.1.nip.io`)
+  - match: Host(`127.0.0.1.nip.io`) && Headers(`UserKey`, `teste`)
     kind: Rule
     services:
     - name: nginx-service
       port: 80
+
+# só faz o redirecionamento caso tenha o header UserKey:teste
+# Utilize o postman ou o modify header no chrome
